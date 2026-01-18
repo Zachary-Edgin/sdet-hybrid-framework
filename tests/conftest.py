@@ -81,3 +81,32 @@ def pytest_runtest_makereport(item, call):
     except Exception:
         # If screenshot fails, don't fail the test suite because of it
         pass
+    
+import pathlib
+import datetime
+
+import pytest
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when != "call" or rep.passed:
+        return
+
+    page = item.funcargs.get("page")
+    if not page:
+        return
+
+    artifacts_dir = pathlib.Path("/work/artifacts")
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    test_name = item.nodeid.replace("/", "_").replace("::", "__").replace(" ", "_")
+    screenshot_path = artifacts_dir / f"{test_name}-{timestamp}.png"
+
+    try:
+        page.screenshot(path=str(screenshot_path), full_page=True)
+    except Exception:
+        pass
