@@ -5,7 +5,7 @@ import pytest
 def test_ui_login_success(base_url, creds, page):
     page.goto(f"{base_url}/")
     page.fill("#username", creds["username"])
-    page.fill("#password", creds["password"])
+    page.fill("#password", "wrong")
     page.click("#login-btn")
 
     page.wait_for_url("**/dashboard")
