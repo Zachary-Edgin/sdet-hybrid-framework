@@ -13,7 +13,7 @@
 
     <form action="/ui/login" method="post">
       <label for="username">Username</label>
-      <input id="username" name="username" />
+      <input id="username" name="username" value="{{ username or '' }}" />
 
       <label for="password">Password</label>
       <input id="password" name="password" type="password" />

@@ -45,7 +45,7 @@ def login_ui(
 
     return templates.TemplateResponse(
         "login.html",
-        {"request": request, "error": "Invalid credentials"}
+        {"request": request, "error": "Invalid credentials", "username": username},
     )
 
 
