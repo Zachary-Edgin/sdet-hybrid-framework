@@ -39,7 +39,10 @@ def login_ui(request: Request, username: str = Form(...), password: str = Form(.
         resp.set_cookie(key=AUTH_COOKIE, value=DEMO_TOKEN, httponly=True)
         return resp
 
-    return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
+return templates.TemplateResponse(
+    "login.html",
+    {"request": request, "error": "Invalid credentials", "username": username},
+)
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
