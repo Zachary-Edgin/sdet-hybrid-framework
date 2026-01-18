@@ -8,7 +8,7 @@ def test_ui_login_success(base_url, creds, page):
     page.fill("#password", "wrong")
     page.click("#login-btn")
 
-    page.wait_for_url("**/dashboard")
+    page.wait_for_url("**/dashboard", timeout=5000)
     assert page.locator("#dashboard-title").inner_text() == "Dashboard"
     assert "Welcome" in page.locator("#welcome").inner_text()
 
