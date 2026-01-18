@@ -12,4 +12,4 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 ## Run locally
 1) Start the app:
 ```bash
-docker compose up -d --build app
+docker compose up -d --build app# test
