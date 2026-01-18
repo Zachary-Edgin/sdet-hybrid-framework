@@ -1,0 +1,25 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start app
+        run: docker compose up -d --build app
+
+      - name: Run tests
+        run: |
+          docker compose build tests
+          docker compose run --rm tests pytest -q --junitxml=/work/artifacts/junit.xml --html=/work/artifacts/report.html --self-contained-html
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: artifacts/

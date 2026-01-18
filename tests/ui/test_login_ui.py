@@ -1,6 +1,7 @@
 import pytest
 
 @pytest.mark.ui
+@pytest.mark.smoke
 def test_ui_login_success(base_url, creds, page):
     page.goto(f"{base_url}/")
     page.fill("#username", creds["username"])
