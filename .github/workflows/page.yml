@@ -58,7 +58,7 @@ jobs:
 
   deploy:
     needs: test
-    if: always()
+    if: needs.test.outputs.test_exit_code == '0'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
