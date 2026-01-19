@@ -17,8 +17,6 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    outputs:
-      test_exit_code: ${{ steps.run_tests.outputs.exit_code }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,8 +27,7 @@ jobs:
       - name: Build tests image
         run: docker compose build tests
 
-      - name: Run tests (capture exit code, don't stop job)
-        id: run_tests
+      - name: Run tests (always produce artifacts)
         shell: bash
         run: |
           set +e
@@ -38,10 +35,154 @@ jobs:
             -q \
             --junitxml=/work/artifacts/junit.xml \
             --html=/work/artifacts/report.html --self-contained-html
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          echo $? > artifacts/exit_code.txt
           exit 0
 
-      # 1) Keep the downloadable artifact
+      # Generate a polished index.html for Pages
+      - name: Generate landing page (index.html)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, glob, xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+
+          junit_path = "artifacts/junit.xml"
+          exit_code_path = "artifacts/exit_code.txt"
+
+          status = "UNKNOWN"
+          exit_code = None
+          if os.path.exists(exit_code_path):
+            try:
+              exit_code = int(open(exit_code_path).read().strip() or "0")
+              status = "PASS" if exit_code == 0 else "FAIL"
+            except Exception:
+              pass
+
+          totals = dict(tests=0, failures=0, errors=0, skipped=0, time=0.0)
+          failed_cases = []
+
+          if os.path.exists(junit_path):
+            root = ET.parse(junit_path).getroot()
+            # junitxml may be <testsuite> or <testsuites>
+            suites = []
+            if root.tag == "testsuite":
+              suites = [root]
+            elif root.tag == "testsuites":
+              suites = root.findall("testsuite")
+
+            for s in suites:
+              totals["tests"] += int(s.attrib.get("tests", 0))
+              totals["failures"] += int(s.attrib.get("failures", 0))
+              totals["errors"] += int(s.attrib.get("errors", 0))
+              totals["skipped"] += int(s.attrib.get("skipped", 0))
+              totals["time"] += float(s.attrib.get("time", 0.0))
+
+              for tc in s.findall("testcase"):
+                name = tc.attrib.get("name", "")
+                classname = tc.attrib.get("classname", "")
+                if tc.find("failure") is not None or tc.find("error") is not None:
+                  failed_cases.append(f"{classname}::{name}".strip(":"))
+
+          screenshots = sorted(glob.glob("artifacts/*.png"))
+          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+          def esc(s: str) -> str:
+            return (s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+                     .replace('"',"&quot;").replace("'","&#39;"))
+
+          badge = "🟢 PASS" if status == "PASS" else ("🔴 FAIL" if status == "FAIL" else "⚪ UNKNOWN")
+
+          html = f"""<!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>SDET Hybrid Framework – Test Report</title>
+            <style>
+              body {{
+                font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+                margin: 0; padding: 0; background: #0b1220; color: #e8eefc;
+              }}
+              .wrap {{ max-width: 980px; margin: 0 auto; padding: 28px 18px 60px; }}
+              .card {{
+                background: #111a2e; border: 1px solid rgba(255,255,255,.08);
+                border-radius: 14px; padding: 18px; margin-top: 14px;
+              }}
+              h1 {{ margin: 0 0 6px; font-size: 22px; }}
+              .sub {{ opacity: .8; font-size: 13px; }}
+              .row {{ display: flex; gap: 12px; flex-wrap: wrap; }}
+              .stat {{
+                flex: 1; min-width: 160px;
+                background: rgba(255,255,255,.05);
+                border: 1px solid rgba(255,255,255,.08);
+                border-radius: 12px; padding: 12px;
+              }}
+              .stat b {{ display: block; font-size: 22px; margin-top: 6px; }}
+              .btns {{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }}
+              a.btn {{
+                display:inline-block; padding: 10px 12px; border-radius: 12px;
+                background: #2b64ff; color: white; text-decoration:none; font-weight: 600;
+              }}
+              a.btn.secondary {{ background: rgba(255,255,255,.10); }}
+              code {{ background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 8px; }}
+              ul {{ margin: 8px 0 0 18px; }}
+              li {{ margin: 6px 0; }}
+              .pill {{
+                display:inline-block; padding: 6px 10px; border-radius: 999px;
+                background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.10);
+                font-weight: 700;
+              }}
+            </style>
+          </head>
+          <body>
+            <div class="wrap">
+              <div class="card">
+                <h1>SDET Hybrid Framework – CI Test Report</h1>
+                <div class="sub">Updated: {esc(now)} · Status: <span class="pill">{esc(badge)}</span></div>
+
+                <div class="btns">
+                  <a class="btn" href="./report.html">Open HTML report</a>
+                  <a class="btn secondary" href="./junit.xml">Download JUnit XML</a>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div class="stat">Total tests<b>{totals["tests"]}</b></div>
+                  <div class="stat">Failures<b>{totals["failures"]}</b></div>
+                  <div class="stat">Errors<b>{totals["errors"]}</b></div>
+                  <div class="stat">Skipped<b>{totals["skipped"]}</b></div>
+                  <div class="stat">Runtime (s)<b>{totals["time"]:.2f}</b></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h2 style="margin:0 0 8px; font-size:16px;">Failing tests</h2>
+                {"<div class='sub'>None ✅</div>" if not failed_cases else "<ul>" + "".join(f"<li><code>{esc(x)}</code></li>" for x in failed_cases[:15]) + "</ul>"}
+                {"" if len(failed_cases) <= 15 else f"<div class='sub'>Showing first 15 of {len(failed_cases)}.</div>"}
+              </div>
+
+              <div class="card">
+                <h2 style="margin:0 0 8px; font-size:16px;">Screenshots (UI failures)</h2>
+                {"<div class='sub'>No screenshots captured.</div>" if not screenshots else "<ul>" + "".join(f"<li><a class='btn secondary' href='./{os.path.basename(p)}'>View {esc(os.path.basename(p))}</a></li>" for p in screenshots) + "</ul>"}
+              </div>
+
+              <div class="card">
+                <div class="sub">
+                  Tip: This page is published from <code>main</code>. Feature branches still upload downloadable artifacts in Actions.
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+          """
+
+          with open("artifacts/index.html", "w", encoding="utf-8") as f:
+            f.write(html)
+          print("Wrote artifacts/index.html")
+          PY
+
+      # Keep the downloadable artifact for hiring managers / reviewers
       - name: Upload downloadable artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -49,7 +190,7 @@ jobs:
           name: test-artifacts
           path: artifacts/
 
-      # 2) Publish same artifacts to Pages
+      # Publish same files to Pages
       - name: Upload Pages artifact
         if: always()
         uses: actions/upload-pages-artifact@v3
@@ -58,12 +199,9 @@ jobs:
 
   deploy:
     needs: test
-    if: needs.test.outputs.test_exit_code == '0'
+    if: always()
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v4
