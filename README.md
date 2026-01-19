@@ -12,13 +12,19 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 - Test artifacts (HTML report + JUnit XML)
 
 ## Run locally
-1) Start the app:
+
+1. Start the app:
 ```bash
-docker compose up -d --build app# test
+docker compose up -d --build app
+```
+
+2. Run tests:
+```bash
+docker compose run --rm tests pytest -q
+```
 
 ## Design Decisions
 - **Docker Compose for stability:** app + test runner execute identically locally and in CI.
 - **API + UI coverage:** API tests validate behavior quickly; UI tests validate critical user flows.
 - **pytest fixtures for reuse:** shared setup/teardown keeps tests maintainable and consistent.
 - **CI artifacts:** GitHub Actions uploads JUnit + HTML reports; UI failures capture screenshots for debugging.
-
