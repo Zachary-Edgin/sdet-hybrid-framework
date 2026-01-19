@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  publish:
+  publish-pages:
     if: >
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main'
@@ -32,24 +32,14 @@ jobs:
 
       - name: Prepare Pages content
         run: |
-          mkdir -p site/latest
-          cp -R artifacts/* site/latest/
+          mkdir -p site
 
-          # One-click landing: redirect / -> /latest/report.html
-          cat > site/index.html << 'EOF'
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="utf-8" />
-              <meta http-equiv="refresh" content="0; url=./latest/report.html" />
-              <title>Test Report</title>
-            </head>
-            <body>
-              <p>Redirecting to the latest test report…</p>
-              <p><a href="./latest/report.html">Open latest report</a></p>
-            </body>
-          </html>
-          EOF
+          # Make the report the homepage
+          cp artifacts/report.html site/index.html
+
+          # Keep the rest available too (junit + screenshots)
+          cp artifacts/junit.xml site/junit.xml 2>/dev/null || true
+          cp artifacts/*.png site/ 2>/dev/null || true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
