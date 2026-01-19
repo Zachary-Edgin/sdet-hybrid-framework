@@ -1,0 +1,69 @@
+name: Publish test report to GitHub Pages (demo)
+
+on:
+  push:
+    branches:
+      - demo-failure-artifacts
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      test_exit_code: ${{ steps.run_tests.outputs.exit_code }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start app
+        run: docker compose up -d --build app
+
+      - name: Build tests image
+        run: docker compose build tests
+
+      - name: Run tests (capture exit code, don't stop job)
+        id: run_tests
+        shell: bash
+        run: |
+          set +e
+          docker compose run --rm tests pytest \
+            -q \
+            --junitxml=/work/artifacts/junit.xml \
+            --html=/work/artifacts/report.html --self-contained-html
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      # 1) Keep the downloadable artifact
+      - name: Upload downloadable artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: artifacts/
+
+      # 2) Publish same artifacts to Pages
+      - name: Upload Pages artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: artifacts/
+
+  deploy:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
