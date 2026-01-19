@@ -15,7 +15,7 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 
 - 🧪 **Intentional failure demo branch (shows screenshot evidence on UI failure):**  
   Branch: `demo-failure-artifacts`  
-  PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
+  PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21150925399) 
   (This branch is intentionally failing — do not merge.)
 
 ## What it includes
