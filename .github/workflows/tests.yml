@@ -19,6 +19,7 @@ jobs:
           docker compose run --rm tests pytest -q --junitxml=/work/artifacts/junit.xml --html=/work/artifacts/report.html --self-contained-html
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts

@@ -33,13 +33,20 @@ def login_page(request: Request):
 
 
 @app.post("/ui/login")
-def login_ui(request: Request, username: str = Form(...), password: str = Form(...)):
+def login_ui(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
     if username == APP_USERNAME and password == APP_PASSWORD:
         resp = RedirectResponse(url="/dashboard", status_code=303)
         resp.set_cookie(key=AUTH_COOKIE, value=DEMO_TOKEN, httponly=True)
         return resp
 
-    return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, "error": "Invalid credentials", "username": username},
+    )
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
