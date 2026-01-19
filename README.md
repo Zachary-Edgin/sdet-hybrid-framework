@@ -4,6 +4,19 @@
 
 A small, portfolio-grade SDET project demonstrating a maintainable test automation framework in Python.
 
+## CI Proof
+
+- ✅ **Latest passing CI run (Actions):**  
+  <PASTE_ACTIONS_RUN_URL_HERE>
+
+- 📦 **Downloadable test artifacts (HTML report + JUnit XML):**  
+  Open the run → **Artifacts** → `test-artifacts`
+
+- 🧪 **Intentional failure demo branch (shows screenshot evidence on UI failure):**  
+  Branch: `demo-failure-artifacts`  
+  PR: <PASTE_PR_URL_HERE>  
+  (This branch is intentionally failing — do not merge.)
+
 ## What it includes
 - Local FastAPI app with a real login UI + JSON API
 - API tests (pytest + requests)
