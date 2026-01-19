@@ -16,27 +16,40 @@ concurrency:
 
 jobs:
   publish:
-    # Only publish when the tests workflow succeeded on main
     if: >
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
 
     steps:
-      # Download the artifact from the triggering workflow run
-      - name: Download test artifacts
+      - name: Download test artifacts from triggering run
         uses: actions/download-artifact@v4
         with:
           name: test-artifacts
+          path: artifacts
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Prepare site output
       - name: Prepare Pages content
         run: |
           mkdir -p site/latest
-          cp -R artifacts/* site/latest/ 2>/dev/null || true
-          cp -R ./* site/latest/ 2>/dev/null || true
+          cp -R artifacts/* site/latest/
+
+          # One-click landing: redirect / -> /latest/report.html
+          cat > site/index.html << 'EOF'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=./latest/report.html" />
+              <title>Test Report</title>
+            </head>
+            <body>
+              <p>Redirecting to the latest test report…</p>
+              <p><a href="./latest/report.html">Open latest report</a></p>
+            </body>
+          </html>
+          EOF
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
