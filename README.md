@@ -7,7 +7,7 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 ## CI Proof
 
 - ✅ **Latest passing CI run (Actions):**  
-  [Open the latest passing run] <https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21151768080>
+  [Open the latest passing run](https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21151768080)
 
 - 📦 **Downloadable test artifacts (HTML report + JUnit XML):**  
   Open the run → **Artifacts** → `test-artifacts`
@@ -15,7 +15,7 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 
 - 🧪 **Intentional failure demo branch (shows screenshot evidence on UI failure):**  
   Branch: `demo-failure-artifacts`  
-  PR: [Intentional failure demo (do not merge)](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
+  PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
   (This branch is intentionally failing — do not merge.)
 
 ## What it includes
