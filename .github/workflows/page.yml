@@ -2,8 +2,8 @@ name: Publish test report to GitHub Pages (demo)
 
 on:
   push:
-    branches:
-      - demo-failure-artifacts
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
