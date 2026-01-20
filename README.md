@@ -7,7 +7,7 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 ## CI Proof
 
 - ✅ **Latest passing CI run (Actions):**  
-  [Open the latest passing run](https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21151768080)
+  [Open the latest passing run](https://zachary-edgin.github.io/sdet-hybrid-framework/?sort=result)
 
 - 📦 **Downloadable test artifacts (HTML report + JUnit XML):**  
   Open the run → **Artifacts** → `test-artifacts`
