@@ -17,11 +17,11 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
   Download `test-artifacts` → open `report.html` (human-friendly) or `junit.xml` (machine-readable).
 
 - 🧪 **Intentional failure demo branch (shows screenshot evidence on UI failure):**  
-  Branch: `demo-failure-artifacts`  
-  PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
-  (This branch is intentionally failing — do not merge.)
-  Run: https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21150925399
-
+  - Branch: `demo-failure-artifacts`  
+  - PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
+  - Run: https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21150925399
+  - (This branch is intentionally failing — do not merge.)
+  
 ## What it includes
 - Local FastAPI app with a real login UI + JSON API
 - API tests (pytest + requests)
