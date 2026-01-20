@@ -6,8 +6,11 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
 
 ## CI Proof
 
+- ✅ **Latest HTML test report (GitHub Pages):**  
+  https://zachary-edgin.github.io/sdet-hybrid-framework/?sort=result
+  
 - ✅ **Latest passing CI run (Actions):**  
-  [Open the latest passing run](https://zachary-edgin.github.io/sdet-hybrid-framework/?sort=result)
+  [Open the latest passing run](https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21176303167)
 
 - 📦 **Downloadable test artifacts (HTML report + JUnit XML):**  
   Open the run → **Artifacts** → `test-artifacts`
@@ -38,7 +41,8 @@ docker compose run --rm tests pytest -q
 ```
 
 ## Design Decisions
-- **Docker Compose for stability:** app + test runner execute identically locally and in CI.
-- **API + UI coverage:** API tests validate behavior quickly; UI tests validate critical user flows.
+- **Docker Compose parity:** app + test runner execute identically locally and in CI to reduce “works on my machine” drift.
+- **API + UI coverage:** API tests validate behavior quickly; UI tests validate critical user flows end-to-end.
 - **pytest fixtures for reuse:** shared setup/teardown keeps tests maintainable and consistent.
-- **CI artifacts:** GitHub Actions uploads JUnit + HTML reports; UI failures capture screenshots for debugging.
+- **Actionable failure evidence:** HTML report + JUnit XML + screenshots on UI failures makes debugging fast.
+- **Artifacts are generated, not committed:** reports/screenshots are produced in CI and published via artifacts + Pages, keeping the repo clean.

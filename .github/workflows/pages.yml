@@ -34,8 +34,24 @@ jobs:
         run: |
           mkdir -p site
 
-          # Make the report the homepage
-          cp artifacts/report.html site/index.html
+          # Put the real report at /report.html
+          cp artifacts/report.html site/report.html
+
+          # Make homepage redirect to the report sorted by result
+          cat > site/index.html <<'EOF'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=report.html?sort=result" />
+              <title>Test Report</title>
+            </head>
+            <body>
+              <p>Redirecting to the latest test report…</p>
+              <p><a href="report.html?sort=result">Open report</a></p>
+            </body>
+          </html>
+          EOF
 
           # Keep the rest available too (junit + screenshots)
           cp artifacts/junit.xml site/junit.xml 2>/dev/null || true
