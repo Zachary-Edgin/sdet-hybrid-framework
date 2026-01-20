@@ -10,18 +10,18 @@ A small, portfolio-grade SDET project demonstrating a maintainable test automati
   https://zachary-edgin.github.io/sdet-hybrid-framework/?sort=result
   
 - ✅ **Latest passing CI run (Actions):**  
-  [Open the latest passing run](https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21176303167)
+  https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21176303167
 
 - 📦 **Downloadable test artifacts (HTML report + JUnit XML):**  
-  Open the run → **Artifacts** → `test-artifacts`
-  Download `test-artifacts` → open `report.html` (human-friendly) or `junit.xml` (machine-readable).
+  Open this run → Artifacts → `test-artifacts`  
+  https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21176303167
 
 - 🧪 **Intentional failure demo branch (shows screenshot evidence on UI failure):**  
   - Branch: `demo-failure-artifacts`  
   - PR: [Intentional failure demo](https://github.com/Zachary-Edgin/sdet-hybrid-framework/pull/1) 
   - Run: https://github.com/Zachary-Edgin/sdet-hybrid-framework/actions/runs/21150925399
   - (This branch is intentionally failing — do not merge.)
-  
+
 ## What it includes
 - Local FastAPI app with a real login UI + JSON API
 - API tests (pytest + requests)
